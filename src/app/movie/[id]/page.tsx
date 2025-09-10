@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import MoviePoster from '@/components/movie/MoviePoster';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Film, Star, Clock, Globe, Award, DollarSign, Users, Languages } from 'lucide-react';
+import { ArrowLeft, Calendar, Film, Star, Clock, Globe, Award, DollarSign, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 interface MovieDetails {

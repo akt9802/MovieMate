@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Film, Star, Calendar, Clock, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Calendar, Film, Star, Clock, Globe, Award, Users } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,7 +51,7 @@ export default function Home() {
         setError(data.Error || 'No movies found');
         setMovies([]);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to search movies');
       setMovies([]);
     } finally {
@@ -249,7 +249,7 @@ export default function Home() {
                 Search Results
               </h2>
               <p className="text-slate-600 dark:text-slate-300">
-                Found {movies.length} movie{movies.length !== 1 ? 's' : ''} for "{query}"
+                Found {movies.length} movie{movies.length !== 1 ? 's' : ''} for &ldquo;{query}&rdquo;
               </p>
             </div>
             
