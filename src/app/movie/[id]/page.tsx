@@ -45,7 +45,6 @@ interface PageProps {
 
 async function getMovieDetails(id: string): Promise<MovieDetails | null> {
   try {
-    // Use the OMDb API directly instead of going through our API route
     const OMDB_API_KEY = process.env.OMDB_API_KEY;
     const OMDB_BASE_URL = 'http://www.omdbapi.com/';
     
@@ -143,7 +142,6 @@ export default async function MovieDetailsPage({ params }: PageProps) {
 
           {/* Movie Details */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Title and Basic Info */}
             <div className="bg-white dark:bg-slate-800 rounded-lg p-6 shadow-sm border border-slate-200 dark:border-slate-700">
               <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">{movie.Title}</h1>
               
