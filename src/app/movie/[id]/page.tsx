@@ -45,8 +45,9 @@ interface PageProps {
 
 async function getMovieDetails(id: string): Promise<MovieDetails | null> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/movies?id=${id}`, {
-      cache: 'no-store', // Ensure fresh data
+    // Using relative URL instead of absolute URL
+    const response = await fetch(`/api/movies?id=${id}`, {
+      cache: 'no-store',
     });
     
     if (!response.ok) {
