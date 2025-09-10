@@ -45,17 +45,33 @@ interface PageProps {
 
 async function getMovieDetails(id: string): Promise<MovieDetails | null> {
   try {
-    // Using relative URL instead of absolute URL
-    const response = await fetch(`/api/movies?id=${id}`, {
+    // Use the OMDb API directly instead of going through our API route
+    const OMDB_API_KEY = process.env.OMDB_API_KEY;
+    const OMDB_BASE_URL = 'http://www.omdbapi.com/';
+    
+    if (!OMDB_API_KEY) {
+      console.error('OMDB_API_KEY not configured');
+      return null;
+    }
+    
+    const url = `${OMDB_BASE_URL}?i=${id}&apikey=${OMDB_API_KEY}`;
+    const response = await fetch(url, {
       cache: 'no-store',
     });
     
     if (!response.ok) {
+      console.error('OMDb API response not ok:', response.status);
       return null;
     }
     
     const data = await response.json();
-    return data.Response === 'True' ? data : null;
+    
+    if (data.Response === 'False') {
+      console.error('OMDb API error:', data.Error);
+      return null;
+    }
+    
+    return data;
   } catch (error) {
     console.error('Error fetching movie details:', error);
     return null;
