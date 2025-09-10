@@ -38,9 +38,9 @@ interface MovieDetails {
 }
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 async function getMovieDetails(id: string): Promise<MovieDetails | null> {
@@ -62,7 +62,8 @@ async function getMovieDetails(id: string): Promise<MovieDetails | null> {
 }
 
 export async function generateMetadata({ params }: PageProps) {
-  const movie = await getMovieDetails(params.id);
+  const { id } = await params;
+  const movie = await getMovieDetails(id);
   
   if (!movie) {
     return {
@@ -82,11 +83,13 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function MovieDetailsPage({ params }: PageProps) {
-  const movie = await getMovieDetails(params.id);
+  const { id } = await params;
+  const movie = await getMovieDetails(id);
 
   if (!movie) {
     notFound();
   }
+
 
   const genres = movie.Genre?.split(', ') || [];
   const ratings = movie.Ratings || [];
