@@ -152,7 +152,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {[...Array(10)].map((_, i) => (
-                <Card key={`skeleton-${i}`} className="h-full flex flex-col overflow-hidden">
+                <Card key={`i-${i}`} className="h-full flex flex-col overflow-hidden">
                   <Skeleton className="h-64 w-full" />
                   <CardHeader className="p-4 flex-1 flex flex-col justify-between">
                     <Skeleton className="h-4 w-3/4 mb-2" />

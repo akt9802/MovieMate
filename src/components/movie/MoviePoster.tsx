@@ -1,7 +1,4 @@
-'use client';
-
 import Image from 'next/image';
-import { useState } from 'react';
 
 interface MoviePosterProps {
   src: string;
@@ -11,11 +8,7 @@ interface MoviePosterProps {
 }
 
 export default function MoviePoster({ src, alt, className, sizes }: MoviePosterProps) {
-  const [imageSrc, setImageSrc] = useState(src);
-
-  const handleError = () => {
-    setImageSrc('/placeholder-movie.svg');
-  };
+  const imageSrc = src && src !== 'N/A' ? src : '/placeholder-movie.svg';
 
   return (
     <Image
@@ -24,7 +17,10 @@ export default function MoviePoster({ src, alt, className, sizes }: MoviePosterP
       fill
       className={className}
       sizes={sizes}
-      onError={handleError}
+      onError={(e) => {
+        const target = e.target as HTMLImageElement;
+        target.src = '/placeholder-movie.svg';
+      }}
     />
   );
 }
