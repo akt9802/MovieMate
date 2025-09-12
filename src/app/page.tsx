@@ -1,71 +1,29 @@
-'use client';
-
-import { useState } from 'react';
-import { Search, Calendar, Film, Star, Clock,TrendingUp } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import {  Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Search, Calendar, Film, Star, Clock } from 'lucide-react';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import MoviePoster from '@/components/movie/MoviePoster';
+import SearchForm from '@/components/SearchForm';
 import Link from 'next/link';
+import { searchMovies, Movie } from '@/lib/movies'; // Import Movie type
 
-interface Movie {
-  Title: string;
-  Year: string;
-  imdbID: string;
-  Type: string;
-  Poster: string;
+interface PageProps {
+  searchParams: Promise<{
+    q?: string;
+  }>;
 }
 
-interface SearchResponse {
-  Search?: Movie[];
-  totalResults?: string;
-  Response: string;
-  Error?: string;
-}
+export default async function Home({ searchParams }: PageProps) {
+  const { q } = await searchParams;
+  const query = q || '';
+  
+  let movies: Movie[] = [];
+  let error: string | null = null;
 
-export default function Home() {
-  const [query, setQuery] = useState('');
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const searchMovies = async () => {
-    if (!query.trim()) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(`/api/movies?q=${encodeURIComponent(query)}`);
-      const data: SearchResponse = await response.json();
-
-      if (data.Response === 'True' && data.Search) {
-        // Remove duplicates based on imdbID and create unique keys
-        const uniqueMovies = data.Search.filter((movie, index, self) => 
-          index === self.findIndex(m => m.imdbID === movie.imdbID)
-        );
-        setMovies(uniqueMovies);
-      } else {
-        setError(data.Error || 'No movies found');
-        setMovies([]);
-      }
-    } catch {
-      setError('Failed to search movies');
-      setMovies([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      searchMovies();
-    }
-  };
-
-  const popularSearches = ['Avengers', 'Batman', 'Inception', 'Titanic', 'Star Wars'];
+  if (query) {
+    const result = await searchMovies(query);
+    movies = result.movies;
+    error = result.error;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
@@ -85,85 +43,14 @@ export default function Home() {
               Find your next favorite movie with our comprehensive search
             </p>
             
-            {/* Search Bar */}
-            <div className="max-w-2xl mx-auto">
-              <div className="flex gap-3">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-                  <Input
-                    type="text"
-                    placeholder="Search for movies..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="pl-12 pr-4 py-3 text-base border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-                <Button 
-                  onClick={searchMovies} 
-                  disabled={loading}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium"
-                >
-                  {loading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Searching</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Search className="h-4 w-4" />
-                      <span>Search</span>
-                    </div>
-                  )}
-                </Button>
-              </div>
-              
-              {/* Quick Search Suggestions */}
-              {!query && (
-                <div className="mt-6 flex flex-wrap justify-center gap-2">
-                  {popularSearches.map((suggestion) => (
-                    <Button
-                      key={suggestion}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setQuery(suggestion)}
-                      className="text-sm border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700"
-                    >
-                      {suggestion}
-                    </Button>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Search Form */}
+            <SearchForm initialQuery={query} />
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        {/* Loading State */}
-        {loading && (
-          <div className="space-y-6">
-            <div className="text-center py-8">
-              <div className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                <TrendingUp className="h-5 w-5" />
-                <span>Searching for movies...</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-              {[...Array(10)].map((_, i) => (
-                <Card key={`i-${i}`} className="h-full flex flex-col overflow-hidden">
-                  <Skeleton className="h-64 w-full" />
-                  <CardHeader className="p-4 flex-1 flex flex-col justify-between">
-                    <Skeleton className="h-4 w-3/4 mb-2" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Error State */}
         {error && (
           <div className="text-center py-16">
@@ -175,19 +62,17 @@ export default function Home() {
                 </h3>
                 <p className="text-red-600 dark:text-red-300 text-sm">{error}</p>
               </div>
-              <Button 
-                onClick={() => setError(null)} 
-                variant="outline"
-                className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
-              >
-                Try Again
-              </Button>
+              <Link href="/">
+                <button className="px-4 py-2 border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20 rounded-md">
+                  Try Again
+                </button>
+              </Link>
             </div>
           </div>
         )}
 
         {/* Empty State */}
-        {!loading && !error && movies.length === 0 && query && (
+        {!error && movies.length === 0 && query && (
           <div className="text-center py-16">
             <div className="max-w-md mx-auto">
               <div className="p-6 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 mb-6">
@@ -199,18 +84,17 @@ export default function Home() {
                   Try different keywords or check your spelling
                 </p>
               </div>
-              <Button 
-                onClick={() => setQuery('')} 
-                variant="outline"
-              >
-                Clear Search
-              </Button>
+              <Link href="/">
+                <button className="px-4 py-2 border border-slate-300 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 rounded-md">
+                  Clear Search
+                </button>
+              </Link>
             </div>
           </div>
         )}
 
         {/* Initial State */}
-        {!loading && !error && movies.length === 0 && !query && (
+        {!error && movies.length === 0 && !query && (
           <div className="text-center py-20">
             <div className="max-w-2xl mx-auto">
               <div className="p-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 mb-8">

@@ -17,10 +17,10 @@ export default function MoviePoster({ src, alt, className, sizes }: MoviePosterP
       fill
       className={className}
       sizes={sizes}
-      onError={(e) => {
-        const target = e.target as HTMLImageElement;
-        target.src = '/placeholder-movie.svg';
-      }}
+      // onError={(e) => {
+      //   const target = e.target as HTMLImageElement;
+      //   target.src = '/placeholder-movie.svg';
+      // }}
     />
   );
 }
